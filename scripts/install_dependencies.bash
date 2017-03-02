@@ -20,22 +20,31 @@ sudo apt-get -y install libgtk2.0-dev
 # optional
 sudo apt-get -y install python-dev python-numpy libtbb2 libtbb-dev libjpeg-dev libpng-dev libtiff-dev libjasper-dev libdc1394-22-dev
 
-#git clone https://github.com/Itseez/opencv.git
-#cd opencv
+git clone https://github.com/Itseez/opencv.git
+cd opencv
 
-git clone https://github.com/Itseez/opencv_contrib.git
-cd opencv_contrib
-git checkout tags/3.0.0
+#git clone https://github.com/Itseez/opencv_contrib.git
+#cd opencv_contrib
+
+#git checkout tags/3.0.0
 
 mkdir build
 cd build
+# I got this warning, but did not have time to test the install. jlb 3-2-17
+
+#CMake Warning:
+#  Manually-specified variables were not used by the project:
+#
+#    CUDA_ARCH_BIN
+#    CUDA_ARCH_PTX
+#
 
 cmake -DWITH_CUDA=ON -DCUDA_ARCH_BIN="3.2" -DCUDA_ARCH_PTX="" -DBUILD_TESTS=OFF -DBUILD_PERF_TESTS=OFF -DCMAKE_INSTALL_PREFIX=/usr ..
 
 sudo make -j4 install
 
 echo "# Use OpenCV and other custom-built libraries." >> ~/.bashrc
-echo "export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib/" >> ~/.bashrc
+echo "export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib/" >> ~/.bashrc
 source ~/.bashrc
 
 #echo "Do you want to test the OpenCV3 build?"
