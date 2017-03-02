@@ -1,5 +1,52 @@
 #!/bin/bash
+echo "Installing OpenCV3 from source with GPU support.  This will take a while."
+#http://elinux.org/Jetson/Installing_OpenCV
+#
+sudo add-apt-repository universe
+sudo apt-get update
 
+# Some general development libraries
+sudo apt-get -y install build-essential make cmake cmake-curses-gui g++ git pkg-config
+# libav video input/output development libraries
+sudo apt-get -y install libavformat-dev libavutil-dev libswscale-dev libavcodec-dev 
+# Video4Linux camera development libraries
+sudo apt-get -y install libv4l-dev
+# Eigen3 math development libraries
+sudo apt-get -y install libeigen3-dev
+# OpenGL development libraries (to allow creating graphical windows)
+sudo apt-get -y install libglew1.6-dev
+# GTK development libraries (to allow creating graphical windows)
+sudo apt-get -y install libgtk2.0-dev
+# optional
+sudo apt-get -y install python-dev python-numpy libtbb2 libtbb-dev libjpeg-dev libpng-dev libtiff-dev libjasper-dev libdc1394-22-dev
+
+git clone https://github.com/Itseez/opencv.git
+
+cd opencv
+mkdir build
+cd build
+
+echo "Do you want to install OpenCV3 with the curses interactive version of CMake?"
+select yn in "Yes" "No"; do
+    case $yn in
+        Yes ) ccmake ..;; 
+        No ) cmake -DWITH_CUDA=ON -DCUDA_ARCH_BIN="3.2" -DCUDA_ARCH_PTX="" -DBUILD_TESTS=OFF -DBUILD_PERF_TESTS=OFF ..;;
+    esac
+    
+sudo make -j4 install
+
+echo "# Use OpenCV and other custom-built libraries." >> ~/.bashrc
+echo "export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib/" >> ~/.bashrc
+source ~/.bashrc
+
+#echo "Do you want to test the OpenCV3 build?"
+#select yn in "Yes" "No"; do
+#    case $yn in
+#        Yes ) ccmake ..;; 
+#        No ) cmake -DWITH_CUDA=ON -DCUDA_ARCH_BIN="3.2" -DCUDA_ARCH_PTX="" -DBUILD_TESTS=OFF -DBUILD_PERF_TESTS=OFF ..;;
+#    esac
+
+        
 # Install ROS if it is not already installed.
 if [ ! -d /opt/ros/kinetic/ ]; then
     # This part very closely follows the instructions from:
@@ -49,14 +96,14 @@ echo "Do you want to install optional IDE QtCreator and associated ROS plugin?"
 select yn in "Yes" "No"; do
     case $yn in
         Yes ) sudo apt install qtcreator; 
-# This command broke the install on ubuntu 16.04.2
-#sudo add-apt-repository ppa:beineri/opt-qt57-xenial;
-#https://github.com/ros-industrial/ros_qtc_plugin/wiki/1.-How-to-Install-(Users)
-#sudo add-apt-repository --remove ppa:beineri/opt-qt57-xenial
-sudo add-apt-repository ppa:levi-armstrong/qt-libraries-xenial 
-sudo add-apt-repository ppa:levi-armstrong/ppa;
-sudo apt-get update && sudo apt-get install qt57creator-plugin-ros;
-sudo apt install qtcreator; break;;
+            # This command broke the install on ubuntu 16.04.2
+            #sudo add-apt-repository ppa:beineri/opt-qt57-xenial;
+            #https://github.com/ros-industrial/ros_qtc_plugin/wiki/1.-How-to-Install-(Users)
+            #sudo add-apt-repository --remove ppa:beineri/opt-qt57-xenial
+            sudo add-apt-repository ppa:levi-armstrong/qt-libraries-xenial; 
+            sudo add-apt-repository ppa:levi-armstrong/ppa;
+            sudo apt-get update && sudo apt-get install qt57creator-plugin-ros;
+            sudo apt install qtcreator; break;;
         No ) exit;;
     esac
 done
