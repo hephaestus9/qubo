@@ -1,7 +1,7 @@
 #!/bin/bash
 echo "Installing OpenCV3 from source with GPU support.  This will take a while."
 #http://elinux.org/Jetson/Installing_OpenCV
-#
+#http://docs.opencv.org/3.0-beta/doc/tutorials/introduction/linux_install/linux_install.html
 sudo add-apt-repository universe
 sudo apt-get update
 
@@ -20,19 +20,18 @@ sudo apt-get -y install libgtk2.0-dev
 # optional
 sudo apt-get -y install python-dev python-numpy libtbb2 libtbb-dev libjpeg-dev libpng-dev libtiff-dev libjasper-dev libdc1394-22-dev
 
-git clone https://github.com/Itseez/opencv.git
+#git clone https://github.com/Itseez/opencv.git
+#cd opencv
 
-cd opencv
+git clone https://github.com/Itseez/opencv_contrib.git
+cd opencv_contrib
+git checkout tags/3.0.0
+
 mkdir build
 cd build
 
-echo "Do you want to install OpenCV3 with the curses interactive version of CMake?"
-select yn in "Yes" "No"; do
-    case $yn in
-        Yes ) ccmake ..;; 
-        No ) cmake -DWITH_CUDA=ON -DCUDA_ARCH_BIN="3.2" -DCUDA_ARCH_PTX="" -DBUILD_TESTS=OFF -DBUILD_PERF_TESTS=OFF ..;;
-    esac
-    
+cmake -DWITH_CUDA=ON -DCUDA_ARCH_BIN="3.2" -DCUDA_ARCH_PTX="" -DBUILD_TESTS=OFF -DBUILD_PERF_TESTS=OFF -DCMAKE_INSTALL_PREFIX=/usr ..
+
 sudo make -j4 install
 
 echo "# Use OpenCV and other custom-built libraries." >> ~/.bashrc
